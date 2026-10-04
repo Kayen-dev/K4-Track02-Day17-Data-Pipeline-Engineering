@@ -23,15 +23,15 @@ from main import fresh_build
 
 def rerun_check(day: str, write: bool = True, quiet: bool = False) -> dict:
     base = fresh_build(quiet=True)
-    runs = [("fresh build", base)]
+    runs = [("C0 fresh build", base)]
     con = connect()
     try:
         for i in range(1, 4):
             try:
                 run_day(con, day)
-                runs.append((f"re-run #{i} of {day}", gold_checksums(con)))
+                runs.append((f"C{i} re-run {day}", gold_checksums(con)))
             except Exception as exc:          # e.g. SnapshotImmutableError
-                runs.append((f"re-run #{i} of {day}", {"error": f"{type(exc).__name__}: {exc}"}))
+                runs.append((f"C{i} re-run {day}", {"error": f"{type(exc).__name__}: {exc}"}))
     finally:
         con.close()
 
@@ -45,8 +45,8 @@ def rerun_check(day: str, write: bool = True, quiet: bool = False) -> dict:
         else:
             lines.append(f"{label:<24}" + "".join(f"{cs[t][:12]:<22}" for t in config.GOLD_TABLES)
                          + cs["gold"])
-    lines += ["", "RESULT: " + ("PASS — 3 re-runs, identical checksums" if ok
-                                else "FAIL — re-running an old day changed Gold")]
+    lines += ["", "RESULT: " + ("PASS — C0 = C1 = C2 = C3" if ok
+                                else "FAIL — C0, C1, C2, C3 are not all equal")]
     text = "\n".join(lines)
     if not quiet:
         print(text)
